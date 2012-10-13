@@ -9,7 +9,7 @@ main focus will have the perfect size for editing, while the ones that are
 not being actively edited will be re-sized to a smaller size that doesn't get
 in the way, but at the same time will be readable enough to know it's content.
 
-![Golden Ratio](https://raw.github.com/roman/golden-ratio.el/master/golden_ratio_el.gif)
+![Golden Ratio](https://raw.github.com/roman/golden-ratio.el/assets/golden_ratio_el.gif)
 
 For more info about the golden ratio check out
 
