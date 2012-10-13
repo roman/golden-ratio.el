@@ -19,7 +19,8 @@
 
 (defun golden-ratio ()
   (interactive)
-  (if (not (window-minibuffer-p))
+  (if (and (not (window-minibuffer-p))
+           (not (one-window-p)))
       (progn
         (balance-windows)
         (-golden-ratio-resize-window (-golden-ratio-dimensions)
