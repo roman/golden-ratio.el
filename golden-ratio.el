@@ -14,9 +14,12 @@
 
 ;;; Code:
 
+(defconst -golden-ratio-value 1.618
+  "The golden ratio value itself.")
+
 (defun -golden-ratio-dimensions ()
-  (let* ((main-rows     (floor (/ (frame-height) 1.618)))
-         (main-columns  (floor (/ (frame-width)  1.618))))
+  (let* ((main-rows     (floor (/ (frame-height) -golden-ratio-value)))
+         (main-columns  (floor (/ (frame-width)  -golden-ratio-value))))
     (list main-rows
           main-columns)))
 
