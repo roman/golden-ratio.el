@@ -6,7 +6,9 @@
 ;; Mantainer: Roman Gonzalez <romanandreg@gmail.com>
 ;; Created: 13 Oct 2012
 ;; Keywords: Window Resizing
-;; Version: 0.0.2
+;; Version: 0.0.3
+
+;; Code inspired by ideas from Tatsuhiro Ujihisa
 
 ;; This file is not part of GNU Emacs.
 

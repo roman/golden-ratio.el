@@ -35,3 +35,7 @@ If you want to disable automatic resizing done by golden-ratio, just invoke
 `(golden-ratio-disable)`
 
 To call golden ratio manually just `M-x golden-ratio`
+
+## Credits
+
+Code inspired by ideas from [Tatsuhiro Ujihisa](http://twitter.com/ujm)
