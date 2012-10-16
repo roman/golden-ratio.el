@@ -13,6 +13,7 @@
 ;; This file is free software (MIT License)
 
 ;;; Code:
+(eval-when-compile (require 'cl))
 
 (defconst -golden-ratio-value 1.618
   "The golden ratio value itself.")
