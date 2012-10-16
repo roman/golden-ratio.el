@@ -34,8 +34,10 @@
                            (- (second dimensions)
                               (window-width window)))))
     (progn
-      (enlarge-window nrow nil)
-      (enlarge-window ncol t))))
+      (if (not (window-full-height-p))
+          (enlarge-window nrow nil))
+      (if (not (window-full-width-p))
+          (enlarge-window ncol t)))))
 
 
 (defun golden-ratio ()
