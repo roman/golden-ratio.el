@@ -26,7 +26,7 @@
 
 
 (defun -golden-ratio-resize-window (dimensions window)
-  (let* ((edges           (window-absolute-pixel-edges window))
+  (let* ((edges           (window-pixel-edges window))
          (nrow            (floor
                            (- (first dimensions)
                               (window-height window))))
