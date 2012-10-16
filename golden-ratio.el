@@ -14,7 +14,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 
 (defun -golden-ratio-dimensions ()
   (let* ((main-rows     (floor (/ (frame-height) 1.618)))
