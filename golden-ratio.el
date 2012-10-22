@@ -72,4 +72,4 @@
 
 (provide 'golden-ratio)
 
-;;; filename ends here
+;;; golden-ratio.el ends here
