@@ -6,7 +6,7 @@
 ;; Mantainer: Roman Gonzalez <romanandreg@gmail.com>
 ;; Created: 13 Oct 2012
 ;; Keywords: Window Resizing
-;; Version: 0.0.3
+;; Version: 0.0.4
 
 ;; Code inspired by ideas from Tatsuhiro Ujihisa
 
@@ -42,6 +42,7 @@
           (enlarge-window ncol t)))))
 
 
+;;;###autoload
 (defun golden-ratio ()
   "Resizes current window to the golden-ratio's size specs"
   (interactive)
@@ -57,17 +58,31 @@
   (after golden-ratio-resize-window)
   (golden-ratio))
 
+(defadvice other-window
+  (after golden-ratio-resize-window)
+  (golden-ratio))
 
+(defadvice split-window
+  (after golden-ratio-resize-window)
+  (golden-ratio))
+
+
+;;;###autoload
 (defun golden-ratio-enable ()
   "Enables golden-ratio's automatic window resizing"
   (interactive)
-  (ad-activate 'select-window))
+  (ad-activate 'select-window)
+  (ad-activate 'other-window)
+  (ad-activate 'split-window))
 
 
+;;;###autoload
 (defun golden-ratio-disable ()
   "Disables golden-ratio's automatic window resizing"
   (interactive)
-  (ad-deactivate 'select-window))
+  (ad-deactivate 'select-window)
+  (ad-deactivate 'other-window)
+  (ad-deactivate 'split-window))
 
 
 (provide 'golden-ratio)
