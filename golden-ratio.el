@@ -20,6 +20,26 @@
 (defconst -golden-ratio-value 1.618
   "The golden ratio value itself.")
 
+;; Major modes that are exempt from being resized. An example of this
+;; for users of Org-mode might be:
+;;  ("calendar-mode")
+(defcustom golden-ratio-exclude-modes nil
+  "An array of strings naming major modes. Switching to a buffer
+whose major mode is a member of this list will not cause the
+window to be resized to the golden ratio."
+  :type '(repeat string)
+  :group 'golden-ratio)
+
+;; Buffer names that are exempt from being resized. An example of this
+;; for users of Org-mode might be (note the leading spaces):
+;;  (" *Org tags*" " *Org todo*")
+(defcustom golden-ratio-exclude-buffer-names nil
+  "An array of strings containing buffer names. Switching to a
+buffer whose name is a member of this list will not cause the
+window to be resized to the golden ratio."
+  :type '(repeat string)
+  :group 'golden-ratio)
+
 (defun -golden-ratio-dimensions ()
   (let* ((main-rows     (floor (/ (frame-height) -golden-ratio-value)))
          (main-columns  (floor (/ (frame-width)  -golden-ratio-value))))
@@ -47,7 +67,11 @@
   "Resizes current window to the golden-ratio's size specs"
   (interactive)
   (if (and (not (window-minibuffer-p))
-           (not (one-window-p)))
+           (not (one-window-p))
+	   (not (member (symbol-name major-mode)
+			golden-ratio-exclude-modes))
+	   (not (member (buffer-name)
+			golden-ratio-exclude-buffer-names)))
       (progn
         (balance-windows)
         (-golden-ratio-resize-window (-golden-ratio-dimensions)
