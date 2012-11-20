@@ -40,6 +40,13 @@ window to be resized to the golden ratio."
   :type '(repeat string)
   :group 'golden-ratio)
 
+(defcustom golden-ratio-inhibit-functions nil
+  "List of functions to call with no arguments. Switching to a
+buffer, if any of these functions returns non-nil will not cause
+the window to be resized to the golden ratio."
+  :group 'golden-ratio
+  :type 'hook)
+
 (defun -golden-ratio-dimensions ()
   (let* ((main-rows     (floor (/ (frame-height) -golden-ratio-value)))
          (main-columns  (floor (/ (frame-width)  -golden-ratio-value))))
@@ -68,10 +75,12 @@ window to be resized to the golden ratio."
   (interactive)
   (if (and (not (window-minibuffer-p))
            (not (one-window-p))
-	   (not (member (symbol-name major-mode)
-			golden-ratio-exclude-modes))
-	   (not (member (buffer-name)
-			golden-ratio-exclude-buffer-names)))
+           (not (member (symbol-name major-mode)
+                        golden-ratio-exclude-modes))
+           (not (member (buffer-name)
+                        golden-ratio-exclude-buffer-names))
+           (not (run-hook-with-args-until-success
+                 'golden-ratio-inhibit-functions)))
       (progn
         (balance-windows)
         (-golden-ratio-resize-window (-golden-ratio-dimensions)
