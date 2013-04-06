@@ -99,6 +99,9 @@ the window to be resized to the golden ratio."
   (after golden-ratio-resize-window)
   (golden-ratio))
 
+(defadvice delete-window
+  (after golden-ratio-resize-window)
+  (golden-ratio))
 
 ;;;###autoload
 (defun golden-ratio-enable ()
@@ -106,7 +109,8 @@ the window to be resized to the golden ratio."
   (interactive)
   (ad-activate 'select-window)
   (ad-activate 'other-window)
-  (ad-activate 'split-window))
+  (ad-activate 'split-window)
+  (ad-activate 'delete-window))
 
 
 ;;;###autoload
@@ -115,7 +119,8 @@ the window to be resized to the golden ratio."
   (interactive)
   (ad-deactivate 'select-window)
   (ad-deactivate 'other-window)
-  (ad-deactivate 'split-window))
+  (ad-deactivate 'split-window)
+  (ad-deactivate 'delete-window))
 
 
 (provide 'golden-ratio)
