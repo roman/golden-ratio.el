@@ -100,8 +100,13 @@ will not cause the window to be resized to the golden ratio."
 
 ;; Should return nil
 (defadvice other-window
-  (after golden-ratio-resize-window)
+    (after golden-ratio-resize-window)
   (golden-ratio) nil)
+
+;; Should return the buffer
+(defadvice pop-to-buffer
+    (around golden-ratio-resize-window)
+  (prog1 ad-do-it (golden-ratio)))
 
 ;;;###autoload
 (define-minor-mode golden-ratio-mode
@@ -110,9 +115,11 @@ will not cause the window to be resized to the golden ratio."
   (if golden-ratio-mode
       (progn
         (add-hook 'window-configuration-change-hook 'golden-ratio)
-        (ad-activate 'other-window))
+        (ad-activate 'other-window)
+        (ad-activate 'pop-to-buffer))
       (remove-hook 'window-configuration-change-hook 'golden-ratio)
-      (ad-deactivate 'other-window)))
+      (ad-deactivate 'other-window)
+      (ad-activate 'pop-to-buffer)))
 
 
 (provide 'golden-ratio)
