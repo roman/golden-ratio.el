@@ -77,44 +77,21 @@ will not cause the window to be resized to the golden ratio."
       ;(balance-windows-area)
       (golden-ratio--resize-window dims))))
 
-;(add-hook 'window-configuration-change-hook 'golden-ratio)
-;; Should return window
-(defadvice select-window
-  (around golden-ratio-resize-window)
-  (prog1 ad-do-it (golden-ratio)))
-
 ;; Should return nil
 (defadvice other-window
   (after golden-ratio-resize-window)
-  (golden-ratio))
-
-;; Should return window
-(defadvice split-window
-  (around golden-ratio-resize-window)
-  (prog1 ad-do-it (golden-ratio)))
-
-;; Should return nil
-(defadvice delete-window
-  (after golden-ratio-resize-window)
-  (golden-ratio))
+  (golden-ratio) nil)
 
 ;;;###autoload
-(defun golden-ratio-enable ()
-  "Enables golden-ratio's automatic window resizing"
-  (interactive)
-  (ad-activate 'select-window)
-  (ad-activate 'other-window)
-  (ad-activate 'split-window)
-  (ad-activate 'delete-window))
-
-;;;###autoload
-(defun golden-ratio-disable ()
-  "Disables golden-ratio's automatic window resizing"
-  (interactive)
-  (ad-deactivate 'select-window)
-  (ad-deactivate 'other-window)
-  (ad-deactivate 'split-window)
-  (ad-deactivate 'delete-window))
+(define-minor-mode golden-ratio-mode
+    "Enable automatic window resizing with golden ratio."
+  :lighter "Golden"
+  (if golden-ratio-mode
+      (progn
+        (add-hook 'window-configuration-change-hook 'golden-ratio)
+        (ad-activate 'other-window))
+      (remove-hook 'window-configuration-change-hook 'golden-ratio)
+      (ad-deactivate 'other-window)))
 
 
 (provide 'golden-ratio)
