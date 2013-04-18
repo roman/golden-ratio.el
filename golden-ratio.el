@@ -53,13 +53,12 @@ will not cause the window to be resized to the golden ratio."
 
 (defun golden-ratio--resize-window (dimensions &optional window)
   (with-selected-window (or window (selected-window))
-    (let (              ;(edges           (window-pixel-edges window))
-          (nrow (floor (- (first dimensions)  (window-height))))
-          (ncol (floor (- (second dimensions) (window-width)))))
-      (cond ((not (window-full-height-p))
-             (enlarge-window nrow nil))
-            ((not (window-full-width-p))
-             (enlarge-window ncol t))))))
+    (let ((nrow  (floor (- (first  dimensions) (window-height))))
+          (ncol  (floor (- (second dimensions) (window-width)))))
+      (when (not (window-full-height-p))
+        (enlarge-window nrow nil))
+      (when (not (window-full-width-p))
+        (enlarge-window ncol t)))))
 
 ;;;###autoload
 (defun golden-ratio ()
@@ -75,9 +74,10 @@ will not cause the window to be resized to the golden ratio."
                    (loop for fun in golden-ratio-inhibit-functions
                          always (funcall fun))))
     (let ((dims (golden-ratio--dimensions)))
-      (balance-windows)
+      ;(balance-windows-area)
       (golden-ratio--resize-window dims))))
 
+;(add-hook 'window-configuration-change-hook 'golden-ratio)
 ;; Should return window
 (defadvice select-window
   (around golden-ratio-resize-window)
