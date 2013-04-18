@@ -20,6 +20,10 @@
 (defconst golden-ratio--value 1.618
   "The golden ratio value itself.")
 
+(defgroup golden-ratio nil
+  "Resize windows to golden ratio."
+  :group 'windows)
+
 ;; Major modes that are exempt from being resized. An example of this
 ;; for users of Org-mode might be:
 ;;  ("calendar-mode")
