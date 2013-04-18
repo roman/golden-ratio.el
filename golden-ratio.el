@@ -74,7 +74,6 @@ will not cause the window to be resized to the golden ratio."
                    (loop for fun in golden-ratio-inhibit-functions
                          always (funcall fun))))
     (let ((dims (golden-ratio--dimensions)))
-      ;(balance-windows-area)
       (golden-ratio--resize-window dims)
       (scroll-left))))
 
