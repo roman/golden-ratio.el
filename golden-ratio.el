@@ -85,7 +85,7 @@ will not cause the window to be resized to the golden ratio."
 ;;;###autoload
 (define-minor-mode golden-ratio-mode
     "Enable automatic window resizing with golden ratio."
-  :lighter "Golden"
+  :lighter " Golden"
   (if golden-ratio-mode
       (progn
         (add-hook 'window-configuration-change-hook 'golden-ratio)
