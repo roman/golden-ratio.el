@@ -53,12 +53,29 @@ will not cause the window to be resized to the golden ratio."
 
 (defun golden-ratio--resize-window (dimensions &optional window)
   (with-selected-window (or window (selected-window))
-    (let ((nrow  (floor (- (first  dimensions) (window-height))))
-          (ncol  (floor (- (second dimensions) (window-width)))))
-      (when (not (window-full-height-p))
+    (let ((nrow  (floor (- (first  dimensions) (window-height-after-balance))))
+          (ncol  (floor (- (second dimensions) (window-width-after-balance)))))
+      (when (window-resizable-p (selected-window) nrow)
         (enlarge-window nrow nil))
-      (when (not (window-full-width-p))
+      (when (window-resizable-p (selected-window) ncol t)
         (enlarge-window ncol t)))))
+
+(defun window-width-after-balance ()
+  (let* ((size-ls (loop for i in (window-list)
+                        unless (window-full-width-p i)
+                        collect (window-width i)))
+         (len (length size-ls))
+         (width (and size-ls (floor (/ (apply #'+ size-ls) len)))))
+    (if width (min (window-width) width) (window-width))))
+
+(defun window-height-after-balance ()
+  (let* ((size-ls (loop for i in (window-list)
+                        unless (or (window-full-height-p i)
+                                   (not (window-full-width-p i)))
+                        collect (window-height i)))
+         (len (length size-ls))
+         (height (and size-ls (floor (/ (apply #'+ size-ls) len)))))
+    (if height (min (window-height) height) (window-height))))
 
 ;;;###autoload
 (defun golden-ratio ()
