@@ -96,7 +96,8 @@ will not cause the window to be resized to the golden ratio."
                          always (funcall fun))))
     (let ((dims (golden-ratio--dimensions)))
       (golden-ratio--resize-window dims)
-      (scroll-left))))
+      (scroll-left)
+      (recenter))))
 
 ;; Should return nil
 (defadvice other-window
@@ -112,6 +113,7 @@ will not cause the window to be resized to the golden ratio."
 (define-minor-mode golden-ratio-mode
     "Enable automatic window resizing with golden ratio."
   :lighter " Golden"
+  :global t
   (if golden-ratio-mode
       (progn
         (add-hook 'window-configuration-change-hook 'golden-ratio)
