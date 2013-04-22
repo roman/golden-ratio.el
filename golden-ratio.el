@@ -51,6 +51,11 @@ will not cause the window to be resized to the golden ratio."
   :group 'golden-ratio
   :type 'hook)
 
+;;; Compatibility
+;;
+(unless (fboundp 'window-resizable-p)
+  (defalias 'window-resizable-p 'window--resizable-p))
+
 (defun golden-ratio--dimensions ()
   (list (floor (/ (frame-height) golden-ratio--value))
         (floor (/ (frame-width)  golden-ratio--value))))
