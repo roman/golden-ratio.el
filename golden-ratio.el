@@ -49,8 +49,14 @@ will not cause the window to be resized to the golden ratio."
 Switching to a buffer, if any of these functions returns non-nil
 will not cause the window to be resized to the golden ratio."
   :group 'golden-ratio
-  :type 'hook)
+  :type '(repeat symbol))
 
+(defcustom golden-ratio-extra-commands
+  '(windmove-left windmove-right windmove-down windmove-up)
+  "List of extra commands used to jump to other window."
+  :group 'golden-ratio
+  :type '(repeat symbol))
+  
 ;;; Compatibility
 ;;
 (unless (fboundp 'window-resizable-p)
@@ -62,8 +68,10 @@ will not cause the window to be resized to the golden ratio."
 
 (defun golden-ratio--resize-window (dimensions &optional window)
   (with-selected-window (or window (selected-window))
-    (let ((nrow  (floor (- (first  dimensions) (golden-ratio--window-height-after-balance))))
-          (ncol  (floor (- (second dimensions) (golden-ratio--window-width-after-balance)))))
+    (let ((nrow  (floor (- (first  dimensions)
+                           (golden-ratio--window-height-after-balance))))
+          (ncol  (floor (- (second dimensions)
+                           (golden-ratio--window-width-after-balance)))))
       (when (window-resizable-p (selected-window) nrow)
         (enlarge-window nrow))
       (when (window-resizable-p (selected-window) ncol t)
@@ -114,6 +122,14 @@ will not cause the window to be resized to the golden ratio."
     (around golden-ratio-resize-window)
   (prog1 ad-do-it (golden-ratio)))
 
+(defun golden-ratio--post-command-hook ()
+  (when (or (memq this-command golden-ratio-extra-commands)
+            (and (consp this-command)
+                 (loop for com in golden-ratio-extra-commands
+                       thereis (or (memq com this-command)
+                                   (memq (car-safe com) this-command)))))
+    (golden-ratio)))
+
 ;;;###autoload
 (define-minor-mode golden-ratio-mode
     "Enable automatic window resizing with golden ratio."
@@ -122,9 +138,11 @@ will not cause the window to be resized to the golden ratio."
   (if golden-ratio-mode
       (progn
         (add-hook 'window-configuration-change-hook 'golden-ratio)
+        (add-hook 'post-command-hook 'golden-ratio--post-command-hook)
         (ad-activate 'other-window)
         (ad-activate 'pop-to-buffer))
       (remove-hook 'window-configuration-change-hook 'golden-ratio)
+      (remove-hook 'post-command-hook 'golden-ratio--post-command-hook)
       (ad-deactivate 'other-window)
       (ad-activate 'pop-to-buffer)))
 
