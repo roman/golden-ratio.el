@@ -65,7 +65,7 @@ will not cause the window to be resized to the golden ratio."
     (let ((nrow  (floor (- (first  dimensions) (window-height-after-balance))))
           (ncol  (floor (- (second dimensions) (window-width-after-balance)))))
       (when (window-resizable-p (selected-window) nrow)
-        (enlarge-window nrow nil))
+        (enlarge-window nrow))
       (when (window-resizable-p (selected-window) ncol t)
         (enlarge-window ncol t)))))
 
