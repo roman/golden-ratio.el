@@ -89,12 +89,14 @@ will not cause the window to be resized to the golden ratio."
                    (loop for fun in golden-ratio-inhibit-functions
                          always (funcall fun))))
     (let ((dims (golden-ratio--dimensions))
-          (golden-p golden-ratio-mode))
-      (and golden-p (golden-ratio-mode -1))
+          (golden-p (if golden-ratio-mode 1 -1)))
+      ;; Always disable `golden-ratio-mode' to avoid
+      ;; infinite loop in `balance-windows'.
+      (golden-ratio-mode -1)
       (balance-windows)
       (golden-ratio--resize-window dims)
       (scroll-right) (recenter)
-      (and golden-p (golden-ratio-mode 1)))))
+      (golden-ratio-mode golden-p))))
 
 ;; Should return nil
 (defadvice other-window
@@ -108,7 +110,7 @@ will not cause the window to be resized to the golden ratio."
 
 (defun golden-ratio--post-command-hook ()
   (when (or (memq this-command golden-ratio-extra-commands)
-            (and (consp this-command)
+            (and (consp this-command) ; A lambda form.
                  (loop for com in golden-ratio-extra-commands
                        thereis (or (memq com this-command)
                                    (memq (car-safe com) this-command)))))
