@@ -87,7 +87,7 @@ will not cause the window to be resized to the golden ratio."
                       golden-ratio-exclude-buffer-names)
               (and golden-ratio-inhibit-functions
                    (loop for fun in golden-ratio-inhibit-functions
-                         always (funcall fun))))
+                         thereis (funcall fun))))
     (let ((dims (golden-ratio--dimensions))
           (golden-p (if golden-ratio-mode 1 -1)))
       ;; Always disable `golden-ratio-mode' to avoid
