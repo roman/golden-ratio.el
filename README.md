@@ -26,13 +26,13 @@ To enable automatic resizing, put on your .emacs.d/init.el
 ```elisp
 (require 'golden-ratio)
 
-(golden-ratio-enable)
+(golden-ratio-mode 1)
 ```
 
 ***
 
 If you want to disable automatic resizing done by golden-ratio, just invoke
-`(golden-ratio-disable)`
+`M-x golden-ratio-mode`
 
 To call golden ratio manually just `M-x golden-ratio`
 
