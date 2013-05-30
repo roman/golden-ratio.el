@@ -56,7 +56,7 @@ will not cause the window to be resized to the golden ratio."
   "List of extra commands used to jump to other window."
   :group 'golden-ratio
   :type '(repeat symbol))
-
+  
 ;;; Compatibility
 ;;
 (unless (fboundp 'window-resizable-p)
@@ -108,11 +108,6 @@ will not cause the window to be resized to the golden ratio."
     (around golden-ratio-resize-window)
   (prog1 ad-do-it (golden-ratio)))
 
-(when (fboundp 'select-window-by-number)
-  (defadvice select-window-by-number
-    (after golden-ratio-resize-window)
-    (golden-ratio) nil))
-
 (defun golden-ratio--post-command-hook ()
   (when (or (memq this-command golden-ratio-extra-commands)
             (and (consp this-command) ; A lambda form.
@@ -131,15 +126,11 @@ will not cause the window to be resized to the golden ratio."
         (add-hook 'window-configuration-change-hook 'golden-ratio)
         (add-hook 'post-command-hook 'golden-ratio--post-command-hook)
         (ad-activate 'other-window)
-        (ad-activate 'pop-to-buffer)
-        (when (fboundp 'select-window-by-number)
-          (ad-activate 'select-window-by-number)))
+        (ad-activate 'pop-to-buffer))
       (remove-hook 'window-configuration-change-hook 'golden-ratio)
       (remove-hook 'post-command-hook 'golden-ratio--post-command-hook)
       (ad-deactivate 'other-window)
-      (ad-deactivate 'pop-to-buffer)
-      (when (fboundp 'select-window-by-number)
-          (ad-deactivate 'select-window-by-number))))
+      (ad-activate 'pop-to-buffer)))
 
 
 (provide 'golden-ratio)
