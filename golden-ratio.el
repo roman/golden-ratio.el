@@ -130,7 +130,7 @@ will not cause the window to be resized to the golden ratio."
       (remove-hook 'window-configuration-change-hook 'golden-ratio)
       (remove-hook 'post-command-hook 'golden-ratio--post-command-hook)
       (ad-deactivate 'other-window)
-      (ad-activate 'pop-to-buffer)))
+      (ad-deactivate 'pop-to-buffer)))
 
 
 (provide 'golden-ratio)
