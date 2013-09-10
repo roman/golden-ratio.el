@@ -95,7 +95,6 @@ will not cause the window to be resized to the golden ratio."
       (golden-ratio-mode -1)
       (balance-windows)
       (golden-ratio--resize-window dims)
-      (scroll-right) (recenter)
       (golden-ratio-mode golden-p))))
 
 ;; Should return nil
