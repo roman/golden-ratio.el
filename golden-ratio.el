@@ -17,16 +17,20 @@
 ;;; Code:
 (eval-when-compile (require 'cl))
 
-(defconst -golden-ratio-value 1.618
+(defconst golden-ratio--value 1.618
   "The golden ratio value itself.")
+
+(defgroup golden-ratio nil
+  "Resize windows to golden ratio."
+  :group 'windows)
 
 ;; Major modes that are exempt from being resized. An example of this
 ;; for users of Org-mode might be:
 ;;  ("calendar-mode")
 (defcustom golden-ratio-exclude-modes nil
-  "An array of strings naming major modes. Switching to a buffer
-whose major mode is a member of this list will not cause the
-window to be resized to the golden ratio."
+  "An array of strings naming major modes.
+Switching to a buffer whose major mode is a member of this list
+will not cause the window to be resized to the golden ratio."
   :type '(repeat string)
   :group 'golden-ratio)
 
@@ -34,79 +38,98 @@ window to be resized to the golden ratio."
 ;; for users of Org-mode might be (note the leading spaces):
 ;;  (" *Org tags*" " *Org todo*")
 (defcustom golden-ratio-exclude-buffer-names nil
-  "An array of strings containing buffer names. Switching to a
-buffer whose name is a member of this list will not cause the
-window to be resized to the golden ratio."
+  "An array of strings containing buffer names.
+Switching to a buffer whose name is a member of this list
+will not cause the window to be resized to the golden ratio."
   :type '(repeat string)
   :group 'golden-ratio)
 
-(defun -golden-ratio-dimensions ()
-  (let* ((main-rows     (floor (/ (frame-height) -golden-ratio-value)))
-         (main-columns  (floor (/ (frame-width)  -golden-ratio-value))))
-    (list main-rows
-          main-columns)))
+(defcustom golden-ratio-inhibit-functions nil
+  "List of functions to call with no arguments.
+Switching to a buffer, if any of these functions returns non-nil
+will not cause the window to be resized to the golden ratio."
+  :group 'golden-ratio
+  :type '(repeat symbol))
 
+(defcustom golden-ratio-extra-commands
+  '(windmove-left windmove-right windmove-down windmove-up)
+  "List of extra commands used to jump to other window."
+  :group 'golden-ratio
+  :type '(repeat symbol))
+  
+;;; Compatibility
+;;
+(unless (fboundp 'window-resizable-p)
+  (defalias 'window-resizable-p 'window--resizable-p))
 
-(defun -golden-ratio-resize-window (dimensions window)
-  (let* ((edges           (window-pixel-edges window))
-         (nrow            (floor
-                           (- (first dimensions)
-                              (window-height window))))
-         (ncol            (floor
-                           (- (second dimensions)
-                              (window-width window)))))
-    (progn
-      (if (not (window-full-height-p))
-          (enlarge-window nrow nil))
-      (if (not (window-full-width-p))
-          (enlarge-window ncol t)))))
+(defun golden-ratio--dimensions ()
+  (list (floor (/ (frame-height) golden-ratio--value))
+        (floor (/ (frame-width)  golden-ratio--value))))
 
+(defun golden-ratio--resize-window (dimensions &optional window)
+  (with-selected-window (or window (selected-window))
+    (let ((nrow  (floor (- (first  dimensions) (window-height))))
+          (ncol  (floor (- (second dimensions) (window-width)))))
+      (when (window-resizable-p (selected-window) nrow)
+        (enlarge-window nrow))
+      (when (window-resizable-p (selected-window) ncol t)
+        (enlarge-window ncol t)))))
 
 ;;;###autoload
 (defun golden-ratio ()
-  "Resizes current window to the golden-ratio's size specs"
+  "Resizes current window to the golden-ratio's size specs."
   (interactive)
-  (if (and (not (window-minibuffer-p))
-           (not (one-window-p))
-	   (not (member (symbol-name major-mode)
-			golden-ratio-exclude-modes))
-	   (not (member (buffer-name)
-			golden-ratio-exclude-buffer-names)))
-      (progn
-        (balance-windows)
-        (-golden-ratio-resize-window (-golden-ratio-dimensions)
-                                     (selected-window)))))
+  (unless (or (window-minibuffer-p)
+              (one-window-p)
+              (member (symbol-name major-mode)
+                      golden-ratio-exclude-modes)
+              (member (buffer-name)
+                      golden-ratio-exclude-buffer-names)
+              (and golden-ratio-inhibit-functions
+                   (loop for fun in golden-ratio-inhibit-functions
+                         thereis (funcall fun))))
+    (let ((dims (golden-ratio--dimensions))
+          (golden-p (if golden-ratio-mode 1 -1)))
+      ;; Always disable `golden-ratio-mode' to avoid
+      ;; infinite loop in `balance-windows'.
+      (golden-ratio-mode -1)
+      (balance-windows)
+      (golden-ratio--resize-window dims)
+      (golden-ratio-mode golden-p))))
 
-
-(defadvice select-window
-  (after golden-ratio-resize-window)
-  (golden-ratio))
-
+;; Should return nil
 (defadvice other-window
-  (after golden-ratio-resize-window)
-  (golden-ratio))
+    (after golden-ratio-resize-window)
+  (golden-ratio) nil)
 
-(defadvice split-window
-  (after golden-ratio-resize-window)
-  (golden-ratio))
+;; Should return the buffer
+(defadvice pop-to-buffer
+    (around golden-ratio-resize-window)
+  (prog1 ad-do-it (golden-ratio)))
 
+(defun golden-ratio--post-command-hook ()
+  (when (or (memq this-command golden-ratio-extra-commands)
+            (and (consp this-command) ; A lambda form.
+                 (loop for com in golden-ratio-extra-commands
+                       thereis (or (memq com this-command)
+                                   (memq (car-safe com) this-command)))))
+    (golden-ratio)))
 
 ;;;###autoload
-(defun golden-ratio-enable ()
-  "Enables golden-ratio's automatic window resizing"
-  (interactive)
-  (ad-activate 'select-window)
-  (ad-activate 'other-window)
-  (ad-activate 'split-window))
-
-
-;;;###autoload
-(defun golden-ratio-disable ()
-  "Disables golden-ratio's automatic window resizing"
-  (interactive)
-  (ad-deactivate 'select-window)
-  (ad-deactivate 'other-window)
-  (ad-deactivate 'split-window))
+(define-minor-mode golden-ratio-mode
+    "Enable automatic window resizing with golden ratio."
+  :lighter " Golden"
+  :global t
+  (if golden-ratio-mode
+      (progn
+        (add-hook 'window-configuration-change-hook 'golden-ratio)
+        (add-hook 'post-command-hook 'golden-ratio--post-command-hook)
+        (ad-activate 'other-window)
+        (ad-activate 'pop-to-buffer))
+      (remove-hook 'window-configuration-change-hook 'golden-ratio)
+      (remove-hook 'post-command-hook 'golden-ratio--post-command-hook)
+      (ad-deactivate 'other-window)
+      (ad-deactivate 'pop-to-buffer)))
 
 
 (provide 'golden-ratio)
