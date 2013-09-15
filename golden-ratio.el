@@ -124,6 +124,7 @@ will not cause the window to be resized to the golden ratio."
       (progn
         (add-hook 'window-configuration-change-hook 'golden-ratio)
         (add-hook 'post-command-hook 'golden-ratio--post-command-hook)
+        (add-hook 'mouse-leave-buffer-hook 'golden-ratio)
         (ad-activate 'other-window)
         (ad-activate 'pop-to-buffer))
       (remove-hook 'window-configuration-change-hook 'golden-ratio)
