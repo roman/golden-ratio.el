@@ -115,6 +115,10 @@ will not cause the window to be resized to the golden ratio."
                                    (memq (car-safe com) this-command)))))
     (golden-ratio)))
 
+(defun golden-ratio--mouse-leave-buffer-hook ()
+  (run-at-time 0.1 nil (lambda ()
+			 (golden-ratio))))
+
 ;;;###autoload
 (define-minor-mode golden-ratio-mode
     "Enable automatic window resizing with golden ratio."
@@ -124,7 +128,7 @@ will not cause the window to be resized to the golden ratio."
       (progn
         (add-hook 'window-configuration-change-hook 'golden-ratio)
         (add-hook 'post-command-hook 'golden-ratio--post-command-hook)
-        (add-hook 'mouse-leave-buffer-hook 'golden-ratio)
+        (add-hook 'mouse-leave-buffer-hook 'golden-ratio--mouse-leave-buffer-hook)
         (ad-activate 'other-window)
         (ad-activate 'pop-to-buffer))
       (remove-hook 'window-configuration-change-hook 'golden-ratio)
