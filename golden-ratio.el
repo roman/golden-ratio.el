@@ -56,7 +56,12 @@ will not cause the window to be resized to the golden ratio."
   "List of extra commands used to jump to other window."
   :group 'golden-ratio
   :type '(repeat symbol))
-  
+
+(defcustom golden-ratio-recenter nil
+  "Recenter window vertically and scroll right when non--nil."
+  :group 'golden-ratio
+  :type 'boolean)
+
 ;;; Compatibility
 ;;
 (unless (fboundp 'window-resizable-p)
@@ -95,6 +100,8 @@ will not cause the window to be resized to the golden ratio."
       (golden-ratio-mode -1)
       (balance-windows)
       (golden-ratio--resize-window dims)
+      (when golden-ratio-recenter
+        (scroll-right) (recenter))
       (golden-ratio-mode golden-p))))
 
 ;; Should return nil
