@@ -140,6 +140,7 @@ will not cause the window to be resized to the golden ratio."
         (ad-activate 'pop-to-buffer))
       (remove-hook 'window-configuration-change-hook 'golden-ratio)
       (remove-hook 'post-command-hook 'golden-ratio--post-command-hook)
+      (remove-hook 'mouse-leave-buffer-hook 'golden-ratio--mouse-leave-buffer-hook)
       (ad-deactivate 'other-window)
       (ad-deactivate 'pop-to-buffer)))
 
