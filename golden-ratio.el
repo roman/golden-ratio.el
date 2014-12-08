@@ -120,7 +120,10 @@ will not cause the window to be resized to the golden ratio."
                  (loop for com in golden-ratio-extra-commands
                        thereis (or (memq com this-command)
                                    (memq (car-safe com) this-command)))))
-    (golden-ratio)))
+    ;; This is needed in emacs-25 to avoid this error from `recenter':
+    ;; `recenter'ing a window that does not display current-buffer.
+    ;; This doesn't happen in emacs-24.4 and previous versions.
+    (run-with-idle-timer 0.01 nil (lambda () (golden-ratio)))))
 
 (defun golden-ratio--mouse-leave-buffer-hook ()
   (run-at-time 0.1 nil (lambda ()
