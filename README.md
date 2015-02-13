@@ -36,6 +36,12 @@ If you want to disable automatic resizing done by golden-ratio, just invoke
 
 To call golden ratio manually just `M-x golden-ratio`
 
+If you use a large screen and have very wide frames, setting the golden-ratio-adjust-width
+variable to something less than 1 will cause the windows to be less wide.
+The golden-ratio-adjust function allows for experimentation with this value.
+
+`M-x golden-ratio-adjust` 
+
 ## Credits
 
 Code inspired by ideas from [Tatsuhiro Ujihisa](http://twitter.com/ujm)
