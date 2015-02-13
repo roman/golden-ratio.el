@@ -36,11 +36,31 @@ If you want to disable automatic resizing done by golden-ratio, just invoke
 
 To call golden ratio manually just `M-x golden-ratio`
 
-If you use a large screen and have very wide frames, setting the golden-ratio-adjust-width
+***
+
+If you use a large screen and have very wide frames, setting the _golden-ratio-adjust-factor_
 variable to something less than 1 will cause the windows to be less wide.
 The golden-ratio-adjust function allows for experimentation with this value.
 
 `M-x golden-ratio-adjust` 
+
+It is also possible to toggle between widescreen and regular width window sizing
+with
+
+`M-x golden-ratio-toggle-widescreen`
+
+The variable _golden-ratio-wide-adjust-factor_ can be set to the adjustment value 
+you desire the widescreen toggle to use.
+
+The following code will set up golden-ratio to adjust for a moderately wide screen
+and also allow toggling between normal, with an adjustment factor of 1, and wide with
+an adjustment factor of .8. For a very wide screen/frame of ~3400 px, .4 works well giving
+screens with a width ~100 columns wide.
+
+```elisp
+(setq golden-ratio-adjust-factor .8
+      golden-ratio-wide-adjust-factor .8)
+```
 
 ## Credits
 
