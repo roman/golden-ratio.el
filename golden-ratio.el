@@ -74,6 +74,13 @@ will not cause the window to be resized to the golden ratio."
   :group 'golden-ratio
   :type 'float)
 
+(defcustom golden-ratio-auto-scale f
+  "Automatic width adjustment factoring. Scales the width
+   of the screens to be smaller as the frame gets bigger."
+  :group 'golden-ratio
+  :type 'boolean)
+
+
 ;;; Compatibility
 ;;
 (unless (fboundp 'window-resizable-p)
@@ -94,10 +101,15 @@ will not cause the window to be resized to the golden ratio."
   (setq golden-ratio-adjust-factor a)
   (golden-ratio))
 
+(defun golden-ratio--scale-factor ()
+  (if golden-ratio-auto-scale
+      (- 1.0 (* (/ (- (frame-width) 100.0) 1000.0) 1.8))
+    golden-ratio-adjust-factor))
+
 (defun golden-ratio--dimensions ()
   (list (floor (/ (frame-height) golden-ratio--value))
         (floor  (* (/ (frame-width)  golden-ratio--value)
-                   golden-ratio-adjust-factor))))
+                   (golden-ratio--scale-factor)))))
 
 (defun golden-ratio--resize-window (dimensions &optional window)
   (with-selected-window (or window (selected-window))

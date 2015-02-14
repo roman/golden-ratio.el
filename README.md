@@ -38,8 +38,18 @@ To call golden ratio manually just `M-x golden-ratio`
 
 ## Wide Screens
 
-If you use a large screen and have very wide frames, setting the _golden-ratio-adjust-factor_
-variable to something less than 1 will cause the windows to be less wide.
+If you use a large screen and have very wide frames golden-ratio makes very 
+wide windows. This can be handled automatically by setting _golden-ratio-auto-scale_
+to true. This does a good job of keeping windows at a reasonable width regardless of
+how wide or narrow your frame size is. This works well on my laptop regardless of
+which monitor or LCD I happen to be using.
+
+`(setq golden-ratio-auto-scale t)` 
+
+For those who wish for manual control,
+If _golden-ratio-auto-scale_ is false, manual control can be exercised
+through the _golden-ratio-adjust-factor_ variable.
+setting it to something less than 1 will cause the windows to be less wide.
 The golden-ratio-adjust function allows for experimentation with this value.
 
 `M-x golden-ratio-adjust` 
