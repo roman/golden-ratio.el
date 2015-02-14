@@ -74,7 +74,7 @@ will not cause the window to be resized to the golden ratio."
   :group 'golden-ratio
   :type 'float)
 
-(defcustom golden-ratio-auto-scale f
+(defcustom golden-ratio-auto-scale nil
   "Automatic width adjustment factoring. Scales the width
    of the screens to be smaller as the frame gets bigger."
   :group 'golden-ratio
