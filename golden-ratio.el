@@ -62,14 +62,54 @@ will not cause the window to be resized to the golden ratio."
   :group 'golden-ratio
   :type 'boolean)
 
+(defcustom golden-ratio-adjust-factor 1.0
+  "Adjust the width sizing by some factor. 1 is no adjustment.
+   For very wide screens/frames, ie. 3400px, .4 may work well."
+  :group 'golden-ratio
+  :type 'integer)
+
+(defcustom golden-ratio-wide-adjust-factor 0.8
+  "Width adjustment factor for widescreens. Used when
+   toggling between widescreen and regular modes."
+  :group 'golden-ratio
+  :type 'float)
+
+(defcustom golden-ratio-auto-scale nil
+  "Automatic width adjustment factoring. Scales the width
+   of the screens to be smaller as the frame gets bigger."
+  :group 'golden-ratio
+  :type 'boolean)
+
+
 ;;; Compatibility
 ;;
 (unless (fboundp 'window-resizable-p)
   (defalias 'window-resizable-p 'window--resizable-p))
 
+(defun golden-ratio-toggle-widescreen ()
+  (interactive)
+  (if (= golden-ratio-adjust-factor 1)
+      (setq golden-ratio-adjust-factor golden-ratio-wide-adjust-factor)
+    (setq golden-ratio-adjust-factor 1))
+  (golden-ratio))
+
+(defun golden-ratio-adjust (a)
+  "set the adjustment of window widths."
+  (interactive
+   (list
+    (read-number "Screeen width adjustment factor: " golden-ratio-adjust-factor)))
+  (setq golden-ratio-adjust-factor a)
+  (golden-ratio))
+
+(defun golden-ratio--scale-factor ()
+  (if golden-ratio-auto-scale
+      (- 1.0 (* (/ (- (frame-width) 100.0) 1000.0) 1.8))
+    golden-ratio-adjust-factor))
+
 (defun golden-ratio--dimensions ()
   (list (floor (/ (frame-height) golden-ratio--value))
-        (floor (/ (frame-width)  golden-ratio--value))))
+        (floor  (* (/ (frame-width)  golden-ratio--value)
+                   (golden-ratio--scale-factor)))))
 
 (defun golden-ratio--resize-window (dimensions &optional window)
   (with-selected-window (or window (selected-window))
