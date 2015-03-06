@@ -27,8 +27,8 @@
 ;; Major modes that are exempt from being resized. An example of this
 ;; for users of Org-mode might be:
 ;;  ("calendar-mode")
-(defcustom golden-ratio-exclude-modes nil
-  "An array of strings naming major modes.
+(defcustom golden-ratio-exclude-modes '(ediff-mode)
+  "An array major mode symbols.
 Switching to a buffer whose major mode is a member of this list
 will not cause the window to be resized to the golden ratio."
   :type '(repeat string)
@@ -132,14 +132,13 @@ will not cause the window to be resized to the golden ratio."
     (let ((golden-ratio-in-progress t))
       (unless (or (window-minibuffer-p)
                   (one-window-p)
-                  (member (symbol-name major-mode)
-                          golden-ratio-exclude-modes)
+                  (memq major-mode golden-ratio-exclude-modes)
                   (member (buffer-name)
                           golden-ratio-exclude-buffer-names)
                   (and golden-ratio-inhibit-functions
                        (loop for fun in golden-ratio-inhibit-functions
                           thereis (funcall fun))))
-        (balance-windows)
+        ;; (balance-windows)
         (golden-ratio--resize-window (golden-ratio--dimensions))
         (when golden-ratio-recenter
           (scroll-right) (recenter))))))
