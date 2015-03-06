@@ -120,72 +120,39 @@ will not cause the window to be resized to the golden ratio."
       (when (window-resizable-p (selected-window) ncol t)
         (enlarge-window ncol t)))))
 
+(defvar golden-ratio-in-progress nil
+  "Avoid recursive adjustment.")
+
 ;;;###autoload
 (defun golden-ratio ()
   "Resizes current window to the golden-ratio's size specs."
   (interactive)
-  (unless (or (window-minibuffer-p)
-              (one-window-p)
-              (member (symbol-name major-mode)
-                      golden-ratio-exclude-modes)
-              (member (buffer-name)
-                      golden-ratio-exclude-buffer-names)
-              (and golden-ratio-inhibit-functions
-                   (loop for fun in golden-ratio-inhibit-functions
-                         thereis (funcall fun))))
-    (let ((dims (golden-ratio--dimensions))
-          (golden-p (if golden-ratio-mode 1 -1)))
-      ;; Always disable `golden-ratio-mode' to avoid
-      ;; infinite loop in `balance-windows'.
-      (golden-ratio-mode -1)
-      (balance-windows)
-      (golden-ratio--resize-window dims)
-      (when golden-ratio-recenter
-        (scroll-right) (recenter))
-      (golden-ratio-mode golden-p))))
+  (when (and golden-ratio-mode
+             (not golden-ratio-in-progress))
+    (let ((golden-ratio-in-progress t))
+      (unless (or (window-minibuffer-p)
+                  (one-window-p)
+                  (member (symbol-name major-mode)
+                          golden-ratio-exclude-modes)
+                  (member (buffer-name)
+                          golden-ratio-exclude-buffer-names)
+                  (and golden-ratio-inhibit-functions
+                       (loop for fun in golden-ratio-inhibit-functions
+                          thereis (funcall fun))))
+        (balance-windows)
+        (golden-ratio--resize-window (golden-ratio--dimensions))
+        (when golden-ratio-recenter
+          (scroll-right) (recenter))))))
 
-;; Should return nil
-(defadvice other-window
-    (after golden-ratio-resize-window)
-  (golden-ratio) nil)
-
-;; Should return the buffer
-(defadvice pop-to-buffer
-    (around golden-ratio-resize-window)
-  (prog1 ad-do-it (golden-ratio)))
-
-(defun golden-ratio--post-command-hook ()
-  (when (or (memq this-command golden-ratio-extra-commands)
-            (and (consp this-command) ; A lambda form.
-                 (loop for com in golden-ratio-extra-commands
-                       thereis (or (memq com this-command)
-                                   (memq (car-safe com) this-command)))))
-    ;; This is needed in emacs-25 to avoid this error from `recenter':
-    ;; `recenter'ing a window that does not display current-buffer.
-    ;; This doesn't happen in emacs-24.4 and previous versions.
-    (run-with-idle-timer 0.01 nil (lambda () (golden-ratio)))))
-
-(defun golden-ratio--mouse-leave-buffer-hook ()
-  (run-at-time 0.1 nil (lambda ()
-			 (golden-ratio))))
+(defadvice select-window (after golden-ratio-select-window activate)
+  (when golden-ratio-mode
+    (golden-ratio)))
 
 ;;;###autoload
 (define-minor-mode golden-ratio-mode
     "Enable automatic window resizing with golden ratio."
   :lighter " Golden"
-  :global t
-  (if golden-ratio-mode
-      (progn
-        (add-hook 'window-configuration-change-hook 'golden-ratio)
-        (add-hook 'post-command-hook 'golden-ratio--post-command-hook)
-        (add-hook 'mouse-leave-buffer-hook 'golden-ratio--mouse-leave-buffer-hook)
-        (ad-activate 'other-window)
-        (ad-activate 'pop-to-buffer))
-      (remove-hook 'window-configuration-change-hook 'golden-ratio)
-      (remove-hook 'post-command-hook 'golden-ratio--post-command-hook)
-      (remove-hook 'mouse-leave-buffer-hook 'golden-ratio--mouse-leave-buffer-hook)
-      (ad-deactivate 'other-window)
-      (ad-deactivate 'pop-to-buffer)))
+  :global t)
 
 
 (provide 'golden-ratio)
