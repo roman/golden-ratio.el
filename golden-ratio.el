@@ -115,9 +115,14 @@ will not cause the window to be resized to the golden ratio."
   (with-selected-window (or window (selected-window))
     (let ((nrow  (floor (- (first  dimensions) (window-height))))
           (ncol  (floor (- (second dimensions) (window-width)))))
-      (when (window-resizable-p (selected-window) nrow)
+      (when (and
+             (window-resizable-p (selected-window) nrow)
+             ;; don't enlarge ignored windows
+             (> nrow 0))
         (enlarge-window nrow))
-      (when (window-resizable-p (selected-window) ncol t)
+      (when (and (window-resizable-p (selected-window) ncol t)
+                 ;; don't enlarge ignored windows
+                 (> ncol 0))
         (enlarge-window ncol t)))))
 
 (defvar golden-ratio-in-progress nil
