@@ -124,7 +124,8 @@ will not cause the window to be resized to the golden ratio."
 (defun golden-ratio ()
   "Resizes current window to the golden-ratio's size specs."
   (interactive)
-  (unless (or (window-minibuffer-p)
+  (unless (or (not golden-ratio-mode)
+              (window-minibuffer-p)
               (one-window-p)
               (member (symbol-name major-mode)
                       golden-ratio-exclude-modes)
@@ -134,15 +135,13 @@ will not cause the window to be resized to the golden ratio."
                    (loop for fun in golden-ratio-inhibit-functions
                          thereis (funcall fun))))
     (let ((dims (golden-ratio--dimensions))
-          (golden-p (if golden-ratio-mode 1 -1)))
+          (golden-ratio-mode nil))
       ;; Always disable `golden-ratio-mode' to avoid
       ;; infinite loop in `balance-windows'.
-      (golden-ratio-mode -1)
       (balance-windows)
       (golden-ratio--resize-window dims)
       (when golden-ratio-recenter
-        (scroll-right) (recenter))
-      (golden-ratio-mode golden-p))))
+        (scroll-right) (recenter)))))
 
 ;; Should return nil
 (defadvice other-window
