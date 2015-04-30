@@ -31,7 +31,7 @@
   "A list of symbols or strings naming major modes.
 Switching to a buffer whose major mode is a member of this list
 will not cause the window to be resized to the golden ratio."
-  :type '(repeat string)
+  :type '(repeat (choice symbol string))
   :group 'golden-ratio)
 
 ;; Buffer names that are exempt from being resized. An example of this
@@ -122,9 +122,9 @@ will not cause the window to be resized to the golden ratio."
 
 (defun golden-ratio-exclude-major-mode-p ()
   "Returns non-nil if `major-mode' should not use golden-ratio."
-  (or (member (symbol-name major-mode)
-              golden-ratio-exclude-modes)
-      (memq major-mode golden-ratio-exclude-modes)))
+  (or (memq major-mode golden-ratio-exclude-modes)
+      (member (symbol-name major-mode)
+              golden-ratio-exclude-modes)))
 
 ;;;###autoload
 (defun golden-ratio ()
