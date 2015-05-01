@@ -143,8 +143,7 @@ will not cause the window to be resized to the golden ratio."
     (let ((golden-ratio-in-progress t))
       (unless (or (window-minibuffer-p)
                   (one-window-p)
-                  (member (symbol-name major-mode)
-                          golden-ratio-exclude-modes)
+                  (golden-ratio-exclude-major-mode-p)
                   (member (buffer-name)
                           golden-ratio-exclude-buffer-names)
                   (and golden-ratio-inhibit-functions
@@ -156,6 +155,10 @@ will not cause the window to be resized to the golden ratio."
           (scroll-right) (recenter))))))
 
 (defadvice select-window (after golden-ratio-select-window activate)
+  (when golden-ratio-mode
+    (golden-ratio)))
+
+(defadvice split-window (after golden-ratio-select-window activate)
   (when golden-ratio-mode
     (golden-ratio)))
 
