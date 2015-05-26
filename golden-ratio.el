@@ -127,10 +127,10 @@ will not cause the window to be resized to the golden ratio."
               golden-ratio-exclude-modes)))
 
 ;;;###autoload
-(defun golden-ratio ()
+(defun golden-ratio (&optional arg)
   "Resizes current window to the golden-ratio's size specs."
-  (interactive)
-  (unless (or (not golden-ratio-mode)
+  (interactive "p")
+  (unless (or (and (not golden-ratio-mode) (null arg))
               (window-minibuffer-p)
               (one-window-p)
               (golden-ratio-exclude-major-mode-p)
