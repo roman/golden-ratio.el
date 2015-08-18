@@ -44,6 +44,13 @@ will not cause the window to be resized to the golden ratio."
   :type '(repeat string)
   :group 'golden-ratio)
 
+(defcustom golden-ratio-exclude-buffer-regexp nil
+  "An array of regexp's used to match buffer names.
+Switching to a buffer whose name matches a member of the regexp
+will prevent the window to be resized to the golden ratio."
+  :type '(repeat string)
+  :group 'golden-ratio)
+
 (defcustom golden-ratio-inhibit-functions nil
   "List of functions to call with no arguments.
 Switching to a buffer, if any of these functions returns non-nil
@@ -134,6 +141,10 @@ will not cause the window to be resized to the golden ratio."
               (window-minibuffer-p)
               (one-window-p)
               (golden-ratio-exclude-major-mode-p)
+              (when golden-ratio-exclude-buffer-regexp
+                (delq nil (mapcar #'(lambda (s)
+                                      (string-match s (buffer-name)))
+                                  golden-ratio-exclude-buffer-regexp )))
               (member (buffer-name)
                       golden-ratio-exclude-buffer-names)
               (and golden-ratio-inhibit-functions
