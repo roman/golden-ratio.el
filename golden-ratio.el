@@ -161,6 +161,10 @@ will prevent the window to be resized to the golden ratio."
 (defadvice other-window
     (after golden-ratio-resize-window)
   (golden-ratio) nil)
+  
+(defadvice ace-window
+    (after golden-ratio-resize-window)
+  (golden-ratio))
 
 ;; Should return the buffer
 (defadvice pop-to-buffer
@@ -193,11 +197,13 @@ will prevent the window to be resized to the golden ratio."
         (add-hook 'post-command-hook 'golden-ratio--post-command-hook)
         (add-hook 'mouse-leave-buffer-hook 'golden-ratio--mouse-leave-buffer-hook)
         (ad-activate 'other-window)
+        (ad-activate 'ace-window)
         (ad-activate 'pop-to-buffer))
       (remove-hook 'window-configuration-change-hook 'golden-ratio)
       (remove-hook 'post-command-hook 'golden-ratio--post-command-hook)
       (remove-hook 'mouse-leave-buffer-hook 'golden-ratio--mouse-leave-buffer-hook)
       (ad-deactivate 'other-window)
+      (ad-deactivate 'ace-window)
       (ad-deactivate 'pop-to-buffer)))
 
 
