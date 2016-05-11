@@ -176,11 +176,13 @@ will prevent the window to be resized to the golden ratio."
     ;; This is needed in emacs-25 to avoid this error from `recenter':
     ;; `recenter'ing a window that does not display current-buffer.
     ;; This doesn't happen in emacs-24.4 and previous versions.
-    (run-with-idle-timer 0.01 nil (lambda () (golden-ratio)))))
+    (if (<= emacs-major-version 24)
+        (golden-ratio)
+      (run-with-idle-timer 0.01 nil (lambda () (golden-ratio))))))
 
 (defun golden-ratio--mouse-leave-buffer-hook ()
   (run-at-time 0.1 nil (lambda ()
-			 (golden-ratio))))
+                        (golden-ratio))))
 
 ;;;###autoload
 (define-minor-mode golden-ratio-mode
