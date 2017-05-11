@@ -51,12 +51,6 @@ will not cause the window to be resized to the golden ratio."
   :group 'golden-ratio
   :type '(repeat symbol))
 
-(defcustom golden-ratio-extra-commands
-  '(windmove-left windmove-right windmove-down windmove-up)
-  "List of extra commands used to jump to other window."
-  :group 'golden-ratio
-  :type '(repeat symbol))
-
 (defcustom golden-ratio-recenter nil
   "Recenter window vertically and scroll right when non--nil."
   :group 'golden-ratio
@@ -157,30 +151,32 @@ will prevent the window to be resized to the golden ratio."
       (when golden-ratio-recenter
         (scroll-right) (recenter)))))
 
-;; Should return nil
-(defadvice other-window
-    (after golden-ratio-resize-window)
-  (golden-ratio) nil)
+(defvar golden-ratio--focus-alist '()
+  "Golden-ratio-selected window, per frame.")
 
-;; Should return the buffer
-(defadvice pop-to-buffer
-    (around golden-ratio-resize-window)
-  (prog1 ad-do-it (golden-ratio)))
+(defun golden-ratio--focus ()
+  (assq (selected-frame) golden-ratio--focus-alist))
 
-(defun golden-ratio--post-command-hook ()
-  (when (or (memq this-command golden-ratio-extra-commands)
-            (and (consp this-command) ; A lambda form.
-                 (loop for com in golden-ratio-extra-commands
-                       thereis (or (memq com this-command)
-                                   (memq (car-safe com) this-command)))))
-    ;; This is needed in emacs-25 to avoid this error from `recenter':
-    ;; `recenter'ing a window that does not display current-buffer.
-    ;; This doesn't happen in emacs-24.4 and previous versions.
-    (run-with-idle-timer 0.01 nil (lambda () (golden-ratio)))))
+(defun golden-ratio--refocus ()
+  (lexical-let* ((frame (selected-frame))
+                 (new-alist (list (cons frame (frame-selected-window frame)))))
+    (dolist (c golden-ratio--focus-alist)
+      (unless (eq (car c) frame)
+        (when (frame-live-p (car c))
+          (push c new-alist))))
+    (setq golden-ratio--focus-alist new-alist)))
+
+(defun golden-ratio--focus-unchanged-p ()
+  (eq (frame-selected-window) (cdr (golden-ratio--focus))))
+
+(defun golden-ratio--update ()
+  (interactive "p")
+  (unless (golden-ratio--focus-unchanged-p)
+    (golden-ratio--refocus)
+    (golden-ratio)))
 
 (defun golden-ratio--mouse-leave-buffer-hook ()
-  (run-at-time 0.1 nil (lambda ()
-			 (golden-ratio))))
+  (run-at-time 0.1 nil 'golden-ratio--update))
 
 ;;;###autoload
 (define-minor-mode golden-ratio-mode
@@ -189,16 +185,14 @@ will prevent the window to be resized to the golden ratio."
   :global t
   (if golden-ratio-mode
       (progn
-        (add-hook 'window-configuration-change-hook 'golden-ratio)
-        (add-hook 'post-command-hook 'golden-ratio--post-command-hook)
-        (add-hook 'mouse-leave-buffer-hook 'golden-ratio--mouse-leave-buffer-hook)
-        (ad-activate 'other-window)
-        (ad-activate 'pop-to-buffer))
-      (remove-hook 'window-configuration-change-hook 'golden-ratio)
-      (remove-hook 'post-command-hook 'golden-ratio--post-command-hook)
-      (remove-hook 'mouse-leave-buffer-hook 'golden-ratio--mouse-leave-buffer-hook)
-      (ad-deactivate 'other-window)
-      (ad-deactivate 'pop-to-buffer)))
+        (add-hook 'buffer-list-update-hook 'golden-ratio--update)
+        (add-hook 'focus-in-hook 'golden-ratio--update)
+        (add-hook 'focus-out-hook 'golden-ratio--update)
+        (add-hook 'mouse-leave-buffer-hook 'golden-ratio--mouse-leave-buffer-hook))
+    (remove-hook 'buffer-list-update-hook 'golden-ratio--update)
+    (remove-hook 'focus-in-hook 'golden-ratio--update)
+    (remove-hook 'focus-out-hook 'golden-ratio--update)
+    (remove-hook 'mouse-leave-buffer-hook 'golden-ratio--mouse-leave-buffer-hook)))
 
 
 (provide 'golden-ratio)
