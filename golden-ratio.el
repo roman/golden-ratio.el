@@ -169,29 +169,31 @@ will prevent the window to be resized to the golden ratio."
 (defun golden-ratio--focus-unchanged-p ()
   (eq (frame-selected-window) (cdr (golden-ratio--focus))))
 
-(defun golden-ratio--update ()
+(defun golden-ratio--maybe ()
   (interactive "p")
   (unless (golden-ratio--focus-unchanged-p)
     (golden-ratio--refocus)
     (golden-ratio)))
 
 (defun golden-ratio--mouse-leave-buffer-hook ()
-  (run-at-time 0.1 nil 'golden-ratio--update))
+  (run-at-time 0.1 nil 'golden-ratio--maybe))
 
 ;;;###autoload
 (define-minor-mode golden-ratio-mode
-    "Enable automatic window resizing with golden ratio."
+  "Enable automatic window resizing with golden ratio."
   :lighter " Golden"
   :global t
   (if golden-ratio-mode
       (progn
-        (add-hook 'buffer-list-update-hook 'golden-ratio--update)
-        (add-hook 'focus-in-hook 'golden-ratio--update)
-        (add-hook 'focus-out-hook 'golden-ratio--update)
+        (add-hook 'buffer-list-update-hook 'golden-ratio--maybe)
+        (add-hook 'window-configuration-change-hook 'golden-ratio)
+        (add-hook 'focus-in-hook 'golden-ratio--maybe)
+        (add-hook 'focus-out-hook 'golden-ratio--maybe)
         (add-hook 'mouse-leave-buffer-hook 'golden-ratio--mouse-leave-buffer-hook))
-    (remove-hook 'buffer-list-update-hook 'golden-ratio--update)
-    (remove-hook 'focus-in-hook 'golden-ratio--update)
-    (remove-hook 'focus-out-hook 'golden-ratio--update)
+    (remove-hook 'buffer-list-update-hook 'golden-ratio--maybe)
+    (remove-hook 'window-configuration-change-hook 'golden-ratio)
+    (remove-hook 'focus-in-hook 'golden-ratio--maybe)
+    (remove-hook 'focus-out-hook 'golden-ratio--maybe)
     (remove-hook 'mouse-leave-buffer-hook 'golden-ratio--mouse-leave-buffer-hook)))
 
 
