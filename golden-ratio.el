@@ -80,6 +80,11 @@ will not cause the window to be resized to the golden ratio."
   :group 'golden-ratio
   :type 'boolean)
 
+(defcustom golden-ratio-max-width nil
+  "Set a maximum column width on the active window."
+  :group 'golden-ratio
+  :type 'integer)
+
 (defcustom golden-ratio-exclude-buffer-regexp nil
   "A list of regexp's used to match buffer names.
 Switching to a buffer whose name matches one of these regexps
@@ -114,8 +119,11 @@ will prevent the window to be resized to the golden ratio."
 
 (defun golden-ratio--dimensions ()
   (list (floor (/ (frame-height) golden-ratio--value))
-        (floor  (* (/ (frame-width)  golden-ratio--value)
-                   (golden-ratio--scale-factor)))))
+        (let ((width (floor  (* (/ (frame-width)  golden-ratio--value)
+                                (golden-ratio--scale-factor)))))
+          (if golden-ratio-max-width
+              (min golden-ratio-max-width width)
+            width))))
 
 (defun golden-ratio--resize-window (dimensions &optional window)
   (with-selected-window (or window (selected-window))
