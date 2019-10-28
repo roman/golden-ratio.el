@@ -72,6 +72,21 @@ screens with a width ~100 columns wide.
       golden-ratio-wide-adjust-factor .8)
 ```
 
+## Fixed width
+
+When working with files that are required to have a maximum line width or when writing text it's
+sometimes good to have a fixed width on the window you are typing in. For example when editing this
+files it's nice to set:
+```elisp
+(setq golden-ratio-max-width 100)
+```
+
+When I write I like to have two empty buffers on the side and set
+```elisp
+(setq golden-ratio-max-width 72)
+```
+to get a distraction free experience.
+
 ## Credits
 
 Code inspired by ideas from [Tatsuhiro Ujihisa](http://twitter.com/ujm)
