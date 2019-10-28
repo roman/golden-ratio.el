@@ -152,10 +152,12 @@ will prevent the window to be resized to the golden ratio."
           (golden-ratio-mode nil))
       ;; Always disable `golden-ratio-mode' to avoid
       ;; infinite loop in `balance-windows'.
-      (balance-windows)
-      (golden-ratio--resize-window dims)
-      (when golden-ratio-recenter
-        (scroll-right) (recenter)))))
+      (let (window-configuration-change-hook)
+        (balance-windows)
+        (golden-ratio--resize-window dims)
+        (when golden-ratio-recenter
+          (scroll-right) (recenter)))
+      (run-hooks 'window-configuration-change-hook))))
 
 ;; Should return nil
 (defadvice other-window
