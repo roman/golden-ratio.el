@@ -181,8 +181,8 @@ will prevent the window to be resized to the golden ratio."
   (when (or (memq this-command golden-ratio-extra-commands)
             (and (consp this-command) ; A lambda form.
                  (loop for com in golden-ratio-extra-commands
-                       thereis (or (memq com this-command)
-                                   (memq (car-safe com) this-command)))))
+                       thereis (or (member com this-command)
+                                   (member (car-safe com) this-command)))))
     ;; This is needed in emacs-25 to avoid this error from `recenter':
     ;; `recenter'ing a window that does not display current-buffer.
     ;; This doesn't happen in emacs-24.4 and previous versions.
