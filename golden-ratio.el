@@ -127,8 +127,9 @@ will prevent the window to be resized to the golden ratio."
 
 (defun golden-ratio--resize-window (dimensions &optional window)
   (with-selected-window (or window (selected-window))
-    (let ((nrow  (floor (- (first  dimensions) (window-height))))
-          (ncol  (floor (- (second dimensions) (window-width)))))
+    (let* ((m (window-margins))
+           (nrow  (floor (- (first  dimensions) (window-height))))
+           (ncol  (floor (- (second dimensions) (+ (window-width) (or (car m) 0) (or (cdr m) 0))))))
       (when (window-resizable-p (selected-window) nrow)
         (enlarge-window nrow))
       (when (window-resizable-p (selected-window) ncol t)
