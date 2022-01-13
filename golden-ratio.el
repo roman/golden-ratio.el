@@ -15,7 +15,7 @@
 ;; This file is free software (MIT License)
 
 ;;; Code:
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
 
 (defconst golden-ratio--value 1.618
   "The golden ratio value itself.")
@@ -127,8 +127,8 @@ will prevent the window to be resized to the golden ratio."
 
 (defun golden-ratio--resize-window (dimensions &optional window)
   (with-selected-window (or window (selected-window))
-    (let ((nrow  (floor (- (first  dimensions) (window-height))))
-          (ncol  (floor (- (second dimensions) (window-width)))))
+    (let ((nrow  (floor (- (nth 0 dimensions) (window-height))))
+          (ncol  (floor (- (nth 1 dimensions) (window-width)))))
       (when (window-resizable-p (selected-window) nrow)
         (enlarge-window nrow))
       (when (window-resizable-p (selected-window) ncol t)
@@ -151,10 +151,10 @@ will prevent the window to be resized to the golden ratio."
               (member (buffer-name)
                       golden-ratio-exclude-buffer-names)
               (and golden-ratio-exclude-buffer-regexp
-                (loop for r in golden-ratio-exclude-buffer-regexp
+                (cl-loop for r in golden-ratio-exclude-buffer-regexp
                          thereis (string-match r (buffer-name))))
               (and golden-ratio-inhibit-functions
-                   (loop for fun in golden-ratio-inhibit-functions
+                   (cl-loop for fun in golden-ratio-inhibit-functions
                          thereis (funcall fun))))
     (let ((dims (golden-ratio--dimensions))
           (golden-ratio-mode nil))
@@ -180,7 +180,7 @@ will prevent the window to be resized to the golden ratio."
 (defun golden-ratio--post-command-hook ()
   (when (or (memq this-command golden-ratio-extra-commands)
             (and (consp this-command) ; A lambda form.
-                 (loop for com in golden-ratio-extra-commands
+                 (cl-loop for com in golden-ratio-extra-commands
                        thereis (or (member com this-command)
                                    (member (car-safe com) this-command)))))
     ;; This is needed in emacs-25 to avoid this error from `recenter':
