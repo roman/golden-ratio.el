@@ -92,12 +92,12 @@ will prevent the window to be resized to the golden ratio."
   :type '(repeat string)
   :group 'golden-ratio)
 
-(defcustom golden-ratio-minimal-width-change 0
+(defcustom golden-ratio-minimal-width-change 1
   "Minimal width change needed to trigger actual window resizing."
   :group 'golden-ratio
   :type 'integer)
 
-(defcustom golden-ratio-minimal-height-change 0
+(defcustom golden-ratio-minimal-height-change 1
   "Minimal height change needed to trigger actual window resizing."
   :group 'golden-ratio
   :type 'integer)
