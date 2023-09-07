@@ -92,6 +92,16 @@ will prevent the window to be resized to the golden ratio."
   :type '(repeat string)
   :group 'golden-ratio)
 
+(defcustom golden-ratio-minimal-width-change 1
+  "Minimal width change needed to trigger actual window resizing."
+  :group 'golden-ratio
+  :type 'integer)
+
+(defcustom golden-ratio-minimal-height-change 1
+  "Minimal height change needed to trigger actual window resizing."
+  :group 'golden-ratio
+  :type 'integer)
+
 ;;; Compatibility
 ;;
 (unless (fboundp 'window-resizable-p)
@@ -129,9 +139,11 @@ will prevent the window to be resized to the golden ratio."
   (with-selected-window (or window (selected-window))
     (let ((nrow  (floor (- (first  dimensions) (window-height))))
           (ncol  (floor (- (second dimensions) (window-width)))))
-      (when (window-resizable-p (selected-window) nrow)
+      (when (and (> nrow golden-ratio-minimal-height-change)
+                 (window-resizable-p (selected-window) nrow))
         (enlarge-window nrow))
-      (when (window-resizable-p (selected-window) ncol t)
+      (when (and (> ncol golden-ratio-minimal-width-change)
+                 (window-resizable-p (selected-window) ncol t))
         (enlarge-window ncol t)))))
 
 (defun golden-ratio-exclude-major-mode-p ()
