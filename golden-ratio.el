@@ -32,7 +32,7 @@
 ;; WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ;;; Code:
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
 
 (defconst golden-ratio--value 1.618
   "The golden ratio value itself.")
@@ -170,6 +170,7 @@ will prevent the window to be resized to the golden ratio."
       (member (symbol-name major-mode)
               golden-ratio-exclude-modes)))
 
+(defvar golden-ratio-mode)
 ;;;###autoload
 (defun golden-ratio (&optional arg)
   "Resizes current window to the golden-ratio's size specs."
@@ -181,11 +182,11 @@ will prevent the window to be resized to the golden ratio."
               (member (buffer-name)
                       golden-ratio-exclude-buffer-names)
               (and golden-ratio-exclude-buffer-regexp
-                (loop for r in golden-ratio-exclude-buffer-regexp
-                         thereis (string-match r (buffer-name))))
+                   (cl-loop for r in golden-ratio-exclude-buffer-regexp
+                            thereis (string-match r (buffer-name))))
               (and golden-ratio-inhibit-functions
-                   (loop for fun in golden-ratio-inhibit-functions
-                         thereis (funcall fun))))
+                   (cl-loop for fun in golden-ratio-inhibit-functions
+                            thereis (funcall fun))))
     (let ((dims (golden-ratio--dimensions))
           (golden-ratio-mode nil))
       ;; Always disable `golden-ratio-mode' to avoid
@@ -210,9 +211,9 @@ will prevent the window to be resized to the golden ratio."
 (defun golden-ratio--post-command-hook ()
   (when (or (memq this-command golden-ratio-extra-commands)
             (and (consp this-command) ; A lambda form.
-                 (loop for com in golden-ratio-extra-commands
-                       thereis (or (member com this-command)
-                                   (member (car-safe com) this-command)))))
+                 (cl-loop for com in golden-ratio-extra-commands
+                          thereis (or (member com this-command)
+                                      (member (car-safe com) this-command)))))
     ;; This is needed in emacs-25 to avoid this error from `recenter':
     ;; `recenter'ing a window that does not display current-buffer.
     ;; This doesn't happen in emacs-24.4 and previous versions.
